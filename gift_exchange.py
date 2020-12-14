@@ -4,37 +4,6 @@ from copy import deepcopy
 import itertools
 from matplotlib import pyplot as plt
 
-
-def f_upper_bound(n, k, prev_nums=None):
-    """
-    Evaluates the counting function for n and k. Gives a very high upper bound, but evaluates in O(n^2) time
-    :param n: The total number of participants
-    :param k: The number of cycles wanted
-    :param prev_nums: Previously calculated numbers
-    :return: An upper bound of the total number of ways to arrange n people into k separate directed cycles.
-    """
-    if prev_nums is None:
-        prev_nums = {}
-
-    if n not in prev_nums:
-        prev_nums[n] = {}
-    if k == n:
-        prev_nums[n][k] = 1
-        return 1
-    if k == 1:
-        prev_nums[n][k] = math.factorial(n - 1)
-        return math.factorial(n - 1)
-
-    total = 0
-    for i in range(math.ceil(float(n)/float(k)), n - k + 2):
-        total += (int(comb(n, i))**2) * math.factorial(i - 1) * prev_nums.get(n - i, {})\
-            .get(k - 1, f_upper_bound(n - i, k - 1, prev_nums))
-    if n not in prev_nums:
-        prev_nums[n] = {}
-    prev_nums[n][k] = total
-    return total
-
-
 def part(n, k, prev_parts=None):
     """
     Returns deduplicated list of all ways to write m as the sum of j integers
@@ -75,17 +44,17 @@ def f_exact(n, k):
         nodes_left = n
         counts = dict([(x, len(list(y))) for x, y in itertools.groupby(p)])
         print(counts)
+        for num in p:
+            product *= fact(num - 1) * comb(nodes_left, num)
+            nodes_left -= num
         for num in counts:
-            product *= (fact(num - 1)**counts[num]) * \
-                       comb(nodes_left, num * counts[num]) * \
-                       comb(num * counts[num], num) / counts[num]
-            nodes_left -= num * counts[num]
+            product /= fact(counts[num])
 
         total += product
     return int(total)
 
 
-def all_f(n, f=f_upper_bound):
+def all_f(n, f=f_exact):
     """
     Returns all f from 1 to n
     :param n: The max num to consider
@@ -100,7 +69,7 @@ def all_f(n, f=f_upper_bound):
 
 
 if __name__ == "__main__":
-    n = 5
+    n = 20
     averages = []
 
     #for i in range(n + 1)[1:]:
