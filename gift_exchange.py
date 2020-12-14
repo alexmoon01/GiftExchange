@@ -32,18 +32,22 @@ def part(n, k, prev_parts=None):
 
 
 def f_exact(n, k):
+    """
+    Calculator for the amount of ways to arrange n nodes into k cycles
+    :param n: The number of nodes
+    :param k: The number of cycles
+    :return: The amount of ways to arrange n nodes into k cycles
+    """
     def fact(m):
         return math.factorial(m)
 
     partition = part(n, k)
-    print(partition)
 
     total = 0
     for p in partition:
         product = 1
         nodes_left = n
         counts = dict([(x, len(list(y))) for x, y in itertools.groupby(p)])
-        print(counts)
         for num in p:
             product *= fact(num - 1) * comb(nodes_left, num)
             nodes_left -= num
@@ -69,7 +73,7 @@ def all_f(n, f=f_exact):
 
 
 if __name__ == "__main__":
-    n = 20
+    n = 40
     averages = []
 
     #for i in range(n + 1)[1:]:
@@ -94,7 +98,7 @@ if __name__ == "__main__":
     print(test_total)
     print(float(abs(test_total - ideal_total))/float(ideal_total))
     plt.plot(range(n + 1)[1:], all_conf.values())
-    plt.xlabel('k')
+    plt.xlabel(f'k')
     plt.ylabel(f'Num Arrangements of {n} People into k Cycles')
     plt.show()
 
